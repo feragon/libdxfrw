@@ -130,6 +130,7 @@ bool dxfRW::write(DRW_Interface *interface_, DRW::Version ver, bool bin){
     if (ver > DRW::AC1009) {
         writer->writeString(0, "SECTION");
         writer->writeString(2, "CLASSES");
+        iface->writeClasses();
         writer->writeString(0, "ENDSEC");
     }
     writer->writeString(0, "SECTION");
@@ -1593,6 +1594,11 @@ bool dxfRW::writeTables() {
 return true;
 }
 
+bool dxfRW::writeClass(DRW_Class* cl) {
+    cl->write(writer, version);
+    return true;
+}
+
 bool dxfRW::writeBlocks() {
     writer->writeString(0, "BLOCK");
     if (version > DRW::AC1009) {
@@ -1838,7 +1844,7 @@ bool dxfRW::processDxf() {
                     if (sectionstr == "HEADER") {
                         processHeader();
                     } else if (sectionstr == "CLASSES") {
-//                        processClasses();
+                        processClasses();
                     } else if (sectionstr == "TABLES") {
                         processTables();
                     } else if (sectionstr == "BLOCKS") {
@@ -1874,6 +1880,58 @@ bool dxfRW::processHeader() {
             }
         } else header.parseCode(code, reader);
     }
+    return true;
+}
+
+
+/********* Classes Section *********/
+
+bool dxfRW::processClasses() {
+    DRW_DBG("dxfRW::processClasses\n");
+    int code;
+    bool next = true;
+    std::string sectionstr;
+
+    reader->readRec(&code);
+    nextentity = reader->getString();
+
+    do {
+        DRW_DBG(code);
+        DRW_DBG("\n");
+
+        if (code == 0) {
+            DRW_DBG(sectionstr);
+
+            if (nextentity == "CLASS") {
+                processClass();
+            }
+            else if(nextentity == "ENDSEC") {
+                return true;
+            }
+        }
+    } while (next);
+
+    return true;
+};
+
+bool dxfRW::processClass() {
+    DRW_DBG(" processClass\n\n");
+    int code;
+    DRW_Class c;
+
+    while(reader->readRec(&code)) {
+        switch(code) {
+            case 0:
+                nextentity = reader->getString();
+                iface->addClass(c);
+                return true;
+
+            default:
+                c.parseCode(code, reader);
+                break;
+        }
+    }
+
     return true;
 }
 

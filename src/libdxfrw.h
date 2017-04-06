@@ -18,6 +18,7 @@
 #include "drw_objects.h"
 #include "drw_header.h"
 #include "drw_interface.h"
+#include "drw_classes.h"
 
 
 class dxfReader;
@@ -69,6 +70,7 @@ public:
     DRW_ImageDef *writeImage(DRW_Image *ent, std::string name);
     bool writeLeader(DRW_Leader *ent);
     bool writeDimension(DRW_Dimension *ent);
+    bool writeClass(DRW_Class *ent);
     void setEllipseParts(int parts){elParts = parts;} /*!< set parts munber when convert ellipse to polyline */
 
 private:
@@ -80,6 +82,9 @@ private:
     bool processBlock();
     bool processEntities(bool isblock);
     bool processObjects();
+
+    bool processClass();
+    bool processClasses();
 
     bool processLType();
     bool processLayer();

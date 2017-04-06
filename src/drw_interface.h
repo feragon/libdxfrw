@@ -18,6 +18,7 @@
 #include "drw_entities.h"
 #include "drw_objects.h"
 #include "drw_header.h"
+#include "drw_classes.h"
 
 /**
  * Abstract class (interface) for comunicate dxfReader with the application.
@@ -185,9 +186,15 @@ public:
      */
     virtual void addComment(const char* comment) = 0;
 
+    /**
+     * Called for every class definition
+     */
+    virtual void addClass(const DRW_Class& c) = 0;
+
     virtual void writeHeader(DRW_Header& data) = 0;
     virtual void writeBlocks() = 0;
     virtual void writeBlockRecords() = 0;
+    virtual void writeClasses() = 0;
     virtual void writeEntities() = 0;
     virtual void writeLTypes() = 0;
     virtual void writeLayers() = 0;
